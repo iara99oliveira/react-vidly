@@ -6,46 +6,32 @@ class Movie extends Component {
         movies: getMovies()
       };
       render() {
+        const {length: n} = this.state.movies;
+        if(n === 0) return <p>não há filmes em estoque :(</p>
         return (
-
-        <React.Fragment>
-            <div>
-              {this.getStatement()}  
-              
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th scope="col">Title</th>
-                    <th scope="col">Genre</th>
-                    <th scope="col">Stock</th>
-                    <th scope="col">Rate</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {this.getTableLines()}
-                </tbody>
-              </table>
-            </div> 
-
-        </React.Fragment>
+            <React.Fragment>
+                <div> 
+                <p>Temos {n} filmes pra você escolher :)</p>
+                
+                <table className="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Title</th>
+                        <th scope="col">Genre</th>
+                        <th scope="col">Stock</th>
+                        <th scope="col">Rate</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {this.getTableLines()}
+                    </tbody>
+                </table>
+                </div> 
+            </React.Fragment>
         );
     }
 
-    getStatement(){
-        let n = this.state.movies.length;
-        if(n === 0){
-          return <p>não há filmes em estoque :(</p>
-        }else{
-          let s = '';
-          if(n > 1)s = 's';
-    
-          return <p>Temos {this.state.movies.length} filme{s} pra você escolher :)</p>
-    
-        } 
-    
-      }
-    
       getTableLines(){
         
         let movies = this.state.movies;
@@ -71,7 +57,8 @@ class Movie extends Component {
         movies.splice(index, 1);
         console.log(movies);
     
-        this.setState({movies: movies});
+        this.setState({movies}); 
+        //ao invés de passar "{movies: movies}" como parâmetro, podemos simplificar já que os nomes do nosso array e o do state são iguais
       }
     
 }
