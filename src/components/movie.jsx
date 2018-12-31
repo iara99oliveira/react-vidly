@@ -1,92 +1,117 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import { getMovies } from "../services/fakeMovieService";
-import Like from "./common/like";
-import Pagination from "./common/pagination";
+import { getGenres } from "../services/fakeGenreService";
 import { paginate } from "../utils/paginate";
+import Pagination from "./common/pagination";
+import ListGroup from "./common/listGroup";
+import MovieTable from "./movieTable";
+import _ from "lodash";
 
 class Movie extends Component {
-    state = {
-      movies: getMovies(),
-      pageSize: 5,
-      currentPage: 1
-    };
-
-    handleLike = (movie) => {
-      const movies = [...this.state.movies];
-      const index = movies.indexOf(movie);
-      movies[index].liked = !movies[index].liked
-      this.setState({movies})
-
+  state = {
+    movies: [],
+    genres: [],
+    pageSize: 5,
+    currentPage: 1,
+    sortColumn: {
+      path: "title",
+      order: "asc"
     }
+  };
 
-    handleDelete = id => {
-      let movies = this.state.movies;
-  
-      let index = movies.map(function(movie) {
-        return movie._id
-      }).indexOf(id);
-      
-      movies.splice(index, 1);
-      console.log(movies);
-  
-      this.setState({movies}); 
-      //ao invés de passar "{movies: movies}" como parâmetro, podemos simplificar já que os nomes do nosso array e o do state são iguais
-    }
+  componentDidMount() {
+    const genres = [{ _id: "", name: "All Genres" }, ...getGenres()];
+    this.setState({ movies: getMovies(), genres });
+  }
 
-    handlePageChange = page =>{
-      this.setState({currentPage: page});
-      
-    }
+  handleLike = movie => {
+    const movies = [...this.state.movies];
+    const index = movies.indexOf(movie);
+    movies[index].liked = !movies[index].liked;
+    this.setState({ movies });
+  };
 
-    render() {
-      const {length: n} = this.state.movies;
-      const {pageSize, currentPage, movies : allMovies} = this.state;
+  handleDelete = id => {
+    let movies = this.state.movies;
 
-      if(n === 0) return <p>There are no movies here :(</p>
-        
-      const movies = paginate(allMovies, currentPage, pageSize);
+    let index = movies
+      .map(function(movie) {
+        return movie._id;
+      })
+      .indexOf(id);
 
-      return (
-          <React.Fragment>
-              <div> 
-              <p>Look! We have {n} movies for you :)</p>
-              
-              <table className="table">
-                  <thead>
-                  <tr>
-                      <th scope="col">Title</th>
-                      <th scope="col">Genre</th>
-                      <th scope="col">Stock</th>
-                      <th scope="col">Rate</th>
-                      <th/>
-                      <th/>
-                  </tr>
-                  </thead>
-                  <tbody>
-                    {movies.map(movie => 
-                      <tr key={movie._id}>
-                        <td>{movie.title}</td>
-                        <td>{movie.genre.name}</td>
-                        <td>{movie.numberInStock}</td>
-                        <td>{movie.dailyRentalRate}</td>
-                        <td><Like onLike={() => this.handleLike(movie)} liked={movie.liked}/></td>
-                        <td><button onClick={()=> this.handleDelete(movie._id)} className="btn btn-danger btn-sm">Delete</button></td>
-                      </tr>
-                    )}
-                  </tbody>
-              </table>
-              </div> 
-              <Pagination
-                itemsCount={n}
-                pageSize={pageSize}
-                currentPage={currentPage}
-                onPageChange={this.handlePageChange}
-              />
+    movies.splice(index, 1);
 
-          </React.Fragment>
-      );
-    }
+    this.setState({ movies });
+    //ao invés de passar "{movies: movies}" como parâmetro, podemos simplificar já que os nomes do nosso array e o do state são iguais
+  };
+
+  handlePageChange = page => {
+    this.setState({ currentPage: page });
+  };
+
+  handleGenreSelect = genre => {
+    this.setState({ selectedGenre: genre, currentPage: 1 });
+  };
+
+  handleSort = sortColumn => {
+    this.setState({sortColumn});
     
+  };
+
+  render() {
+    const { length: n } = this.state.movies;
+    const {
+      pageSize,
+      currentPage,
+      movies: allMovies,
+      genres,
+      selectedGenre,
+      sortColumn
+    } = this.state;
+
+    if (n === 0) return <p>There are no movies here :(</p>;
+
+    const filtered =
+      selectedGenre && selectedGenre._id
+        ? allMovies.filter(m => m.genre._id === selectedGenre._id)
+        : allMovies;
+    
+    const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
+    
+    const movies = paginate(sorted, currentPage, pageSize);
+
+    return (
+      <React.Fragment>
+        <div className="row">
+          <div className="col-3">
+            <ListGroup
+              items={genres}
+              selectedItem={selectedGenre}
+              onItemSelect={this.handleGenreSelect}
+            />
+          </div>
+          <div className="col">
+            <p>Look! We have {filtered.length} movies for you :)</p>
+            <MovieTable
+              movies={movies}
+              sortColumn={sortColumn}
+              onLike={this.handleLike}
+              onDelete={this.handleDelete}
+              onSort={this.handleSort}
+            />
+            <Pagination
+              itemsCount={filtered.length}
+              pageSize={pageSize}
+              currentPage={currentPage}
+              onPageChange={this.handlePageChange}
+            />
+          </div>
+          ;
+        </div>
+      </React.Fragment>
+    );
+  }
 }
- 
+
 export default Movie;
