@@ -2,9 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import _ from "lodash";
 
-const Pagination = props => {
-  //define as props necessarias em variáveis
-  const {itemsCount, pageSize, currentPage, onPageChange} = props;  
+const Pagination = ({itemsCount, pageSize, currentPage, onPageChange}) => {
   
   //define o número de página necessárias
     //(Math.ceil define um num inteiro maior ou igual do que o float que é retornado na divisão)
