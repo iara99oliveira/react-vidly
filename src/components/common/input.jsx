@@ -7,8 +7,8 @@ const Input = ({ name, label, value, onChange }) => {
       <input
         value={value}
         onChange={onChange}
-        id="name"
-        name="name"
+        id={name}
+        name={name}
         type="text"
         className="form-control"
         autoFocus

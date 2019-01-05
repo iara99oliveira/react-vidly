@@ -31,7 +31,7 @@ class LoginForm extends Component {
         <h1>Login</h1>
         <form onSubmit={this.handleSubmit}>
           <Input
-            name="usename"
+            name="username"
             label="Username"
             value={account.username}
             onChange={this.handleChange}
