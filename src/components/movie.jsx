@@ -55,34 +55,44 @@ class Movie extends Component {
   };
 
   handleSort = sortColumn => {
-    this.setState({sortColumn});
-    
+    this.setState({ sortColumn });
   };
 
   getPagedData = () => {
-    const {pageSize, currentPage, movies: allMovies, selectedGenre, sortColumn
+    const {
+      pageSize,
+      currentPage,
+      movies: allMovies,
+      selectedGenre,
+      sortColumn
     } = this.state;
-    
+
     const filtered =
       selectedGenre && selectedGenre._id
         ? allMovies.filter(m => m.genre._id === selectedGenre._id)
         : allMovies;
-    
+
     const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
-    
+
     const movies = paginate(sorted, currentPage, pageSize);
 
-    return {totalCount: filtered.length, data: movies};
-  }
+    return { totalCount: filtered.length, data: movies };
+  };
 
   render() {
     const { length: n } = this.state.movies;
-    const {pageSize, currentPage, genres, selectedGenre, sortColumn} = this.state;
+    const {
+      pageSize,
+      currentPage,
+      genres,
+      selectedGenre,
+      sortColumn
+    } = this.state;
 
     if (n === 0) return <p>There are no movies here :(</p>;
 
-    const {totalCount, data: movies} = this.getPagedData();
-    
+    const { totalCount, data: movies } = this.getPagedData();
+
     return (
       <React.Fragment>
         <div className="row">
@@ -109,7 +119,6 @@ class Movie extends Component {
               onPageChange={this.handlePageChange}
             />
           </div>
-          ;
         </div>
       </React.Fragment>
     );
